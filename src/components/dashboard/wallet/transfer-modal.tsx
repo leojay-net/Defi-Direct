@@ -30,7 +30,7 @@ interface TransferModalProps {
 
 export function TransferModal({ open, onOpenChange }: TransferModalProps) {
   const chainId = useChainId();
-  const tokens = getTokensForChain(chainId || 4202); // Default to Lisk Sepolia
+  const tokens = getTokensForChain(chainId || 2810); // Default to Morph Holesky
 
   const [banks, setBanks] = useState<Bank[]>([]);
   const [loading, setLoading] = useState(false);
@@ -184,7 +184,7 @@ export function TransferModal({ open, onOpenChange }: TransferModalProps) {
 
   // Reset selected token when chain changes
   useEffect(() => {
-    const newTokens = getTokensForChain(chainId || 4202);
+    const newTokens = getTokensForChain(chainId || 2810);
     setSelectedToken(newTokens[0]);
   }, [chainId]);
 
@@ -419,9 +419,6 @@ export function TransferModal({ open, onOpenChange }: TransferModalProps) {
 
       // Parse the transaction receipt to get event data
       const parsedReceipt = await parseTransactionReceipt(receipt);
-      if (!parsedReceipt) {
-        throw new Error("Failed to parse transaction receipt");
-      }
 
       // Step 2: Save initial transaction to backend database
       const transactionData = {
@@ -491,6 +488,7 @@ export function TransferModal({ open, onOpenChange }: TransferModalProps) {
             body: JSON.stringify({
               transactionId: parsedReceipt.txId,
               amountSpent: parsedReceipt.amount.toString(), // Convert BigInt to string
+              chainId: chainId || 2810, // Include chainId (default to Morph Holesky)
             }),
           });
 

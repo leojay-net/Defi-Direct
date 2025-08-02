@@ -1,4 +1,4 @@
-import { CONTRACT_ABI, getContractAddress } from '@/paydirect';
+import { CONTRACT_ABI, CONTRACT_ADDRESS, getContractAddress } from '@/paydirect';
 import { ethers } from 'ethers';
 import { TransactionReceipt as ViemTransactionReceipt } from 'viem';
 import { TransactionReceipt as EthersTransactionReceipt } from 'ethers';
@@ -167,29 +167,81 @@ export const initiateTransaction = async (
 const contractInterface = new ethers.Interface(CONTRACT_ABI);
 
 export async function parseTransactionReceipt(receipt: CombinedTransactionReceipt) {
-  for (const log of receipt.logs) {
+  // Get the transaction hash depending on the receipt type
+  const txHash = 'transactionHash' in receipt ? receipt.transactionHash : receipt.hash;
+
+  console.log("Parsing transaction receipt:", {
+    status: receipt.status,
+    transactionHash: txHash,
+    blockNumber: receipt.blockNumber,
+    logsCount: receipt.logs.length,
+    expectedContractAddress: CONTRACT_ADDRESS.toLowerCase()
+  });
+
+  // Check if transaction was successful
+  if (receipt.status !== 'success') {
+    throw new Error(`Transaction failed with status: ${receipt.status}`);
+  }
+
+  if (!receipt.logs || receipt.logs.length === 0) {
+    throw new Error("No logs found in transaction receipt");
+  }
+
+  // Log all event addresses to see if any match our contract
+  const logAddresses = receipt.logs.map((log, index) => `${index}: ${log.address.toLowerCase()}`).join(', ');
+  console.log("Log addresses:", logAddresses);
+
+  for (let i = 0; i < receipt.logs.length; i++) {
+    const log = receipt.logs[i];
+
+    // Check if this log is from our contract
+    const isFromOurContract = log.address.toLowerCase() === CONTRACT_ADDRESS.toLowerCase();
+
     try {
       // Decode the log
       const parsedLog = contractInterface.parseLog(log);
 
-      // Check if the log is the TransactionInitiated event
-      if (parsedLog && parsedLog.name === "TransactionInitiated") {
+      console.log(`Log ${i}:`, {
+        name: parsedLog?.name,
+        topics: log.topics,
+        address: log.address,
+        isFromOurContract: isFromOurContract
+      });
+
+      // Check if the log is the TransactionInitiated event from our contract
+      if (parsedLog && parsedLog.name === "TransactionInitiated" && isFromOurContract) {
         const txId = parsedLog.args.txId;
         const user = parsedLog.args.user;
         const amount = parsedLog.args.amount;
 
-        console.log("Transaction ID:", txId);
-        console.log("User:", user);
-        console.log("Amount:", amount.toString());
+        console.log("Found TransactionInitiated event:", {
+          txId: txId,
+          user: user,
+          amount: amount.toString()
+        });
 
         return { txId, user, amount };
       }
-    } catch {
-      // Skip logs that cannot be parsed (e.g., logs from other contracts
+    } catch (error) {
+      console.log(`Failed to parse log ${i}:`, error);
+      // Skip logs that cannot be parsed (e.g., logs from other contracts)
       continue;
     }
   }
 
-  console.log("TransactionInitiated event not found in logs");
-  return null;
+  // If no TransactionInitiated event found, let's check what events we did find
+  const eventNames = receipt.logs
+    .map((log, index) => {
+      try {
+        const parsed = contractInterface.parseLog(log);
+        const isFromOurContract = log.address.toLowerCase() === CONTRACT_ADDRESS.toLowerCase();
+        return `${index}: ${parsed?.name || 'Unknown'} (${isFromOurContract ? 'OUR CONTRACT' : 'OTHER CONTRACT'})`;
+      } catch {
+        return `${index}: Unparseable`;
+      }
+    })
+    .join(', ');
+
+  console.error("TransactionInitiated event not found. Found events:", eventNames);
+  throw new Error(`TransactionInitiated event not found in transaction logs. Found events: ${eventNames}`);
 }
