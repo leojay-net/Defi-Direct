@@ -2,23 +2,24 @@
 import type { Chain } from 'wagmi/chains';
 import type { AppKitNetwork } from '@reown/appkit/networks';
 
-// Define Morph Holesky network
-const morphHolesky: Chain = {
-    id: 2810,
-    name: 'Morph Holesky',
-    nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+// Define Electroneum Testnet network
+const electroneumTestnet: Chain = {
+    id: 5201420,
+    name: 'Electroneum Testnet',
+    nativeCurrency: { name: 'Electroneum', symbol: 'ETN', decimals: 18 },
     rpcUrls: {
-        default: { http: ['https://rpc-holesky.morphl2.io'] }
+        default: { http: ['https://rpc.ankr.com/electroneum_testnet'] }
     },
     blockExplorers: {
-        default: { name: 'Morph Holesky Explorer', url: 'https://explorer-holesky.morphl2.io' }
+        // Update if there's an official explorer URL; placeholder left empty for now
+        default: { name: 'Electroneum Testnet Explorer', url: 'https://explorer.electroneum.com/testnet' }
     },
     testnet: true
 };
 
-// Define the networks your dApp will support consistently - only Morph Holesky
+// Define the networks your dApp will support consistently - only Electroneum Testnet
 export const supportedChains: Chain[] = [
-    morphHolesky
+    electroneumTestnet
 ];
 
 // Export chain IDs for easy reference
@@ -51,7 +52,7 @@ export function chainToAppKitNetwork(chain: Chain): AppKitNetwork {
 // Export AppKit networks derived from our supported chains
 export const appKitNetworks: AppKitNetwork[] = supportedChains.map(chainToAppKitNetwork);
 
-// Chain icon mapping for Morph Holesky
+// Chain icon mapping for Electroneum Testnet
 export const chainIcons: Record<number, string> = {
-    [morphHolesky.id]: 'https://cryptologos.cc/logos/morph-logo.png', // You can update this with actual Morph logo
+    [electroneumTestnet.id]: 'https://cryptologos.cc/logos/electroneum-etn-logo.png',
 };

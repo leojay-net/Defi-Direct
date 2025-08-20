@@ -3,12 +3,12 @@ import { ethers } from "ethers";
 import { CONTRACT_ABI, getContractAddress } from "@/paydirect";
 import { supportedChains } from '@/config/networks';
 
-// Get Morph Holesky chain (the only supported chain)
-const morphHolesky = supportedChains[0];
+// Get Electroneum Testnet chain (the only supported chain)
+const electroneum = supportedChains[0];
 
-// RPC URL configuration for Morph Holesky
+// RPC URL configuration for Electroneum Testnet
 const RPC_URLS = {
-    [morphHolesky.id]: process.env.NEXT_PUBLIC_RPC_URL || "https://rpc-holesky.morphl2.io"
+    [electroneum.id]: process.env.NEXT_PUBLIC_RPC_URL || "https://rpc.ankr.com/electroneum_testnet"
 };
 
 // This should be stored securely in environment variables

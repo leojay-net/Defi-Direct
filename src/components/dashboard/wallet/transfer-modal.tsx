@@ -30,7 +30,7 @@ interface TransferModalProps {
 
 export function TransferModal({ open, onOpenChange }: TransferModalProps) {
   const chainId = useChainId();
-  const tokens = getTokensForChain(chainId || 2810); // Default to Morph Holesky
+  const tokens = getTokensForChain(chainId || 5201420); // Default to Electroneum Testnet
 
   const [banks, setBanks] = useState<Bank[]>([]);
   const [loading, setLoading] = useState(false);
@@ -184,7 +184,7 @@ export function TransferModal({ open, onOpenChange }: TransferModalProps) {
 
   // Reset selected token when chain changes
   useEffect(() => {
-    const newTokens = getTokensForChain(chainId || 2810);
+    const newTokens = getTokensForChain(chainId || 5201420);
     setSelectedToken(newTokens[0]);
   }, [chainId]);
 
@@ -488,7 +488,7 @@ export function TransferModal({ open, onOpenChange }: TransferModalProps) {
             body: JSON.stringify({
               transactionId: parsedReceipt.txId,
               amountSpent: parsedReceipt.amount.toString(), // Convert BigInt to string
-              chainId: chainId || 2810, // Include chainId (default to Morph Holesky)
+              chainId: chainId || 5201420, // Include chainId (default to Electroneum Testnet)
             }),
           });
 

@@ -1,12 +1,12 @@
-// src/config.js - Morph Holesky contract configuration
+// src/config.js - Electroneum Testnet contract configuration
 import { getContractAddresses } from './config';
 import { supportedChains } from './config/networks';
 
-// Get Morph Holesky chain (the only supported chain)
-const morphHolesky = supportedChains[0];
+// Get Electroneum Testnet chain (the only supported chain)
+const electroneum = supportedChains[0];
 
-// Default to Morph Holesky contract address (only supported network)
-export const CONTRACT_ADDRESS = getContractAddresses(morphHolesky.id).fiatBridge;
+// Default to Electroneum Testnet contract address (only supported network)
+export const CONTRACT_ADDRESS = getContractAddresses(electroneum.id).fiatBridge;
 
 // Helper function to get contract address for specific chain
 export function getContractAddress(chainId: number): `0x${string}` {
